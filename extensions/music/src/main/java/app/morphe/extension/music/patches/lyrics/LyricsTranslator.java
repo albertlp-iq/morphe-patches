@@ -96,23 +96,23 @@ public final class LyricsTranslator {
                     toTranslate, TextTranslator.MAXIMUM_BATCH_CHARACTERS)) {
                 List<String> translatedBatch = TextTranslator.translate(batch, language);
 
-                // A mismatched count cannot be mapped back safely, and showing lines
-                // under the wrong lyrics is worse than showing no translation at all.
-                if (translatedBatch.size() != batch.size()) {
-                    Logger.printDebug(() -> "Batch line count mismatched (expected " + batch.size()
-                            + " but got " + translatedBatch.size() + "), falling back to line-by-line translation");
-                    translatedBatch = new ArrayList<>(batch.size());
+                if (translatedBatch.size() == batch.size()) {
+                    translated.addAll(translatedBatch);
+                } else {
+                    final int expectedSize = batch.size();
+                    final int gotSize = translatedBatch.size();
+                    Logger.printDebug(() -> "Batch line count mismatched (expected " + expectedSize
+                            + " but got " + gotSize + "), falling back to line-by-line translation");
                     for (String singleLine : batch) {
                         try {
                             List<String> singleRes = TextTranslator.translate(
                                     Collections.singletonList(singleLine), language);
-                            translatedBatch.add(singleRes.isEmpty() ? singleLine : singleRes.get(0));
+                            translated.add(singleRes.isEmpty() ? singleLine : singleRes.get(0));
                         } catch (Exception ex) {
-                            translatedBatch.add(singleLine);
+                            translated.add(singleLine);
                         }
                     }
                 }
-                translated.addAll(translatedBatch);
             }
         } catch (Exception ex) {
             Logger.printException(() -> "Could not translate the lyrics", ex);
