@@ -136,7 +136,7 @@ public final class RomajiTransliterator {
                 for (String chunk : RomajiDictionaryData.DATA_CHUNKS) {
                     sb.append(chunk);
                 }
-                byte[] decoded = android.util.Base64.decode(sb.toString(), android.util.Base64.DEFAULT);
+                byte[] decoded = java.util.Base64.getDecoder().decode(sb.toString());
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                         new GZIPInputStream(new ByteArrayInputStream(decoded)), StandardCharsets.UTF_8))) {
                     String line;
