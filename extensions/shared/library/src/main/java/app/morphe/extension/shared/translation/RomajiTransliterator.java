@@ -195,7 +195,7 @@ public final class RomajiTransliterator {
             // 1. Try matching multi-character compound word from dictionary (longest match first)
             boolean matched = false;
             int maxLookahead = Math.min(10, len - i);
-            for (int l = maxLookahead; l > 1; l--) {
+            for (int l = maxLookahead; l >= 1; l--) {
                 String sub = text.substring(i, i + l);
                 String reading = COMPOUNDS.get(sub);
                 if (reading != null) {
@@ -224,12 +224,14 @@ public final class RomajiTransliterator {
                     String val;
                     if (isFollowedByKana) {
                         val = !stem.isEmpty() ? stem : (!kun.isEmpty() ? kun : on);
+                        kanaBuilder.append(' ').append(val);
                     } else if (isFollowedByKanji || isPrecededByKanji) {
                         val = !on.isEmpty() ? on : (!kun.isEmpty() ? kun : stem);
+                        kanaBuilder.append(val);
                     } else {
                         val = !kun.isEmpty() ? kun : (!on.isEmpty() ? on : stem);
+                        kanaBuilder.append(' ').append(val).append(' ');
                     }
-                    kanaBuilder.append(' ').append(val).append(' ');
                 } else {
                     kanaBuilder.append(c);
                 }

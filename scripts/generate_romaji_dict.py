@@ -113,6 +113,46 @@ def main():
         '彼女': 'かのじょ',
         '誰': 'だれ',
         '何': 'なに',
+        '日': 'ひ',
+        '空': 'そら',
+        '夜': 'よる',
+        '朝': 'あさ',
+        '星': 'ほし',
+        '月': 'つき',
+        '花': 'はな',
+        '声': 'こえ',
+        '夢': 'ゆめ',
+        '道': 'みち',
+        '神': 'かみ',
+        '人': 'ひと',
+        '手': 'て',
+        '目': 'め',
+        '背中': 'せなか',
+        '一言': 'ひとこと',
+        '全て': 'すべて',
+        '初めて': 'はじめて',
+        '会った': 'あった',
+        '奪った': 'うばった',
+        '抱いて': 'だいて',
+        '分かった': 'わかった',
+        '沈み出した': 'しずみだした',
+        '重なって': 'かさなって',
+        '裏切る': 'うらぎる',
+        '熱い': 'あつい',
+        '大事': 'だいじ',
+        '温もり': 'ぬくもり',
+        '痛み': 'いたみ',
+        '間に合う': 'まにあう',
+        '歩いて': 'あるいて',
+        '伝えたくて': 'つたえたくて',
+        '去りゆく': 'さりゆく',
+        '神話': 'しんわ',
+        '少年': 'しょうねん',
+        '宇宙': 'うちゅう',
+        '二人': 'ふたり',
+        '姿': 'すがた',
+        '悲しみ': 'かなしみ',
+        '限り': 'かぎり',
     }
     compounds.update(lyrics_vocab)
     print(f"Total compound vocabulary words: {len(compounds)}")
@@ -146,8 +186,7 @@ def main():
     # Compound lines: WORD=READING
     # ---
     # Kanji lines: KANJI=ON,KUN,STEM
-    # Filter to top ~12,000 compound words to keep source file lean and lightning-fast
-    comp_lines = [f"{k}={v}" for k, v in list(compounds.items())[:12000]]
+    comp_lines = [f"{k}={v}" for k, v in compounds.items()]
     kanji_lines = [f"{k}={v['on']},{v['kun']},{v['stem']}" for k, v in kanji_table.items()]
 
     raw_text = "\n".join(comp_lines) + "\n---\n" + "\n".join(kanji_lines)
