@@ -312,6 +312,84 @@ def test_song(artist, track, compounds, kanji_table):
     except Exception as ex:
         print(f"Could not fetch from LRCLIB: {ex}")
 
+def test_youtube(video_id_or_url, compounds, kanji_table):
+    import re
+    import json
+    m = re.search(r'([a-zA-Z0-9_-]{11})', video_id_or_url)
+    video_id = m.group(1) if m else video_id_or_url
+    print(f"\nFetching lyrics from YouTube Music for videoId: {video_id}...")
+
+    next_url = "https://music.youtube.com/youtubei/v1/next"
+    payload = {
+        "videoId": video_id,
+        "context": {"client": {"clientName": "ANDROID_MUSIC", "clientVersion": "6.43.52", "hl": "ja"}}
+    }
+    headers = {"Content-Type": "application/json", "User-Agent": "com.google.android.apps.youtube.music/6.43.52"}
+    try:
+        req = urllib.request.Request(next_url, data=json.dumps(payload).encode("utf-8"), headers=headers)
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+
+        tabs = data.get("contents", {}).get("singleColumnMusicWatchNextResultsRenderer", {}).get("tabbedRenderer", {}).get("watchNextTabbedResultsRenderer", {}).get("tabs", [])
+        browse_id = None
+        for t in tabs:
+            tr = t.get("tabRenderer", {})
+            bid = tr.get("endpoint", {}).get("browseEndpoint", {}).get("browseId")
+            if bid and bid.startswith("MPLY"):
+                browse_id = bid
+                break
+
+        if not browse_id:
+            print("No lyrics browseId found in YouTube Music next endpoint.")
+            return
+
+        b_url = "https://music.youtube.com/youtubei/v1/browse"
+        b_payload = {"browseId": browse_id, "context": {"client": {"clientName": "ANDROID_MUSIC", "clientVersion": "6.43.52", "hl": "ja"}}}
+        req2 = urllib.request.Request(b_url, data=json.dumps(b_payload).encode("utf-8"), headers=headers)
+        with urllib.request.urlopen(req2) as resp2:
+            bdata = json.loads(resp2.read().decode("utf-8"))
+
+        def find_key(obj, key):
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    if k == key: return v
+                    res = find_key(v, key)
+                    if res is not None: return res
+            elif isinstance(obj, list):
+                for item in obj:
+                    res = find_key(item, key)
+                    if res is not None: return res
+            return None
+
+        timed = find_key(bdata, "timedLyricsData")
+        lines = []
+        if timed and isinstance(timed, list):
+            print(f"Found YouTube Music Timed Lyrics ({len(timed)} lines)!\n" + "=" * 60)
+            for item in timed:
+                txt = item.get("lyricLine", "").strip()
+                if txt and txt != "♪":
+                    lines.append(txt)
+        else:
+            shelf = find_key(bdata, "musicDescriptionShelfRenderer")
+            if shelf:
+                runs = shelf.get("description", {}).get("runs", [])
+                full_text = "".join([r.get("text", "") for r in runs])
+                footer = shelf.get("footer", {}).get("runs", [{}])[0].get("text", "LyricFind")
+                print(f"Found YouTube Static Lyrics ({footer})!\n" + "=" * 60)
+                lines = [l.strip() for l in full_text.split("\n") if l.strip()]
+
+        if not lines:
+            print("No lyrics lines found in response.")
+            return
+
+        for line in lines[:15]:
+            rom = transliterate_to_romaji(line, compounds, kanji_table)
+            print(f"  {line}")
+            print(f"  -> {rom}\n")
+
+    except Exception as ex:
+        print(f"Could not fetch from YouTube Music: {ex}")
+
 def test_interactive(compounds, kanji_table):
     print("\n" + "=" * 60)
     print("  Interactive Romaji Transliteration REPL")
@@ -337,6 +415,7 @@ def main():
     parser.add_argument("text", nargs="?", help="Direct text/lyric to transliterate")
     parser.add_argument("-i", "--interactive", action="store_true", help="Start interactive REPL")
     parser.add_argument("--song", nargs=2, metavar=("ARTIST", "TITLE"), help="Fetch and test song from LRCLIB")
+    parser.add_argument("--yt", metavar="VIDEO_ID_OR_URL", help="Fetch and test lyrics directly from YouTube Music / LyricFind")
 
     args = parser.parse_args()
 
@@ -344,7 +423,9 @@ def main():
     compounds, kanji_table = load_dictionary()
     print(f" done! ({len(compounds)} compounds, {len(kanji_table)} kanji loaded)\n")
 
-    if args.song:
+    if args.yt:
+        test_youtube(args.yt, compounds, kanji_table)
+    elif args.song:
         test_song(args.song[0], args.song[1], compounds, kanji_table)
     elif args.interactive:
         test_interactive(compounds, kanji_table)

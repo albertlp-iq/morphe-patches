@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import app.morphe.extension.music.patches.lyrics.requests.KuGouProvider;
 import app.morphe.extension.music.patches.lyrics.requests.LrcLibProvider;
 import app.morphe.extension.music.patches.lyrics.requests.LyricsProvider;
+import app.morphe.extension.music.patches.lyrics.requests.YouTubeMusicProvider;
 import app.morphe.extension.music.settings.Settings;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
@@ -263,7 +264,7 @@ public final class LyricsManager {
     }
 
     private static List<LyricsProvider> providersInOrder() {
-        List<LyricsProvider> providers = new ArrayList<>(2);
+        List<LyricsProvider> providers = new ArrayList<>(3);
         switch (Settings.LYRICS_SOURCE.get()) {
             case LRCLIB:
                 providers.add(new LrcLibProvider());
@@ -271,12 +272,27 @@ public final class LyricsManager {
             case KUGOU:
                 providers.add(new KuGouProvider());
                 break;
+            case YOUTUBE_MUSIC:
+                providers.add(new YouTubeMusicProvider());
+                break;
             case LRCLIB_THEN_KUGOU:
             default:
                 providers.add(new LrcLibProvider());
                 providers.add(new KuGouProvider());
                 break;
         }
+
+        boolean hasYt = false;
+        for (LyricsProvider p : providers) {
+            if (p instanceof YouTubeMusicProvider) {
+                hasYt = true;
+                break;
+            }
+        }
+        if (!hasYt) {
+            providers.add(new YouTubeMusicProvider());
+        }
+
         return providers;
     }
 }

@@ -13,5 +13,6 @@ package app.morphe.extension.music.patches.lyrics;
 public enum LyricsSource {
     LRCLIB_THEN_KUGOU,
     LRCLIB,
-    KUGOU
+    KUGOU,
+    YOUTUBE_MUSIC
 }

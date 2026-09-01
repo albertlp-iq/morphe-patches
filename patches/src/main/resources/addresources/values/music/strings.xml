@@ -343,6 +343,7 @@ To ensure scrobbling is synced during background playback, ensure that YouTube M
     <string name="morphe_music_lyrics_source_entry_lrclib_then_kugou">LRCLIB, then KuGou</string>
     <string name="morphe_music_lyrics_source_entry_lrclib" translatable="false">LRCLIB</string>
     <string name="morphe_music_lyrics_source_entry_kugou" translatable="false">KuGou</string>
+    <string name="morphe_music_lyrics_source_entry_youtube_music" translatable="false">YouTube Music (LyricFind / Captions)</string>
     <string name="morphe_music_lyrics_tap_to_seek_title">Tap a line to seek</string>
     <string name="morphe_music_lyrics_tap_to_seek_summary">Tapping a line jumps to that moment in the song</string>
     <string name="morphe_music_lyrics_show_copy_button_title">Show Copy button</string>
