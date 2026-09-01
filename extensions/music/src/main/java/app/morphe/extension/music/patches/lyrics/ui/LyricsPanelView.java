@@ -232,6 +232,7 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
 
         scrollView = new ScrollView(context);
         scrollView.setFillViewport(true);
+        scrollView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         scrollView.addView(linesContainer, new FrameLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
@@ -266,14 +267,54 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        if (getParent() instanceof ViewGroup parent) {
+            parent.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
+                @Override
+                public void onChildViewAdded(View p, View child) {
+                    if (child != LyricsPanelView.this && getVisibility() == VISIBLE) {
+                        child.setVisibility(GONE);
+                        hiddenSiblings.add(child);
+                        bringToFront();
+                    }
+                }
+
+                @Override
+                public void onChildViewRemoved(View p, View child) {
+                    hiddenSiblings.remove(child);
+                }
+            });
+        }
         LyricsManager.getInstance().addListener(this);
         handler.removeCallbacks(ticker);
         handler.post(ticker);
+        applyOverlayVisibility();
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (getVisibility() == VISIBLE && getParent() instanceof ViewGroup parent) {
+            boolean needBringToFront = false;
+            for (int i = 0; i < parent.getChildCount(); i++) {
+                View sibling = parent.getChildAt(i);
+                if (sibling != this && sibling.getVisibility() != GONE) {
+                    sibling.setVisibility(GONE);
+                    hiddenSiblings.add(sibling);
+                    needBringToFront = true;
+                }
+            }
+            if (needBringToFront || parent.getChildAt(parent.getChildCount() - 1) != this) {
+                bringToFront();
+            }
+        }
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        if (getParent() instanceof ViewGroup parent) {
+            parent.setOnHierarchyChangeListener(null);
+        }
         LyricsManager.getInstance().removeListener(this);
         handler.removeCallbacks(ticker);
         // Nothing would show them again once this panel is gone.
@@ -368,14 +409,15 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
 
         for (int i = 0; i < parent.getChildCount(); i++) {
             View sibling = parent.getChildAt(i);
-            if (sibling == this
-                    || sibling.getVisibility() != VISIBLE
-                    || hiddenSiblings.contains(sibling)) {
+            if (sibling == this) {
                 continue;
             }
-            sibling.setVisibility(GONE);
+            if (sibling.getVisibility() != GONE) {
+                sibling.setVisibility(GONE);
+            }
             hiddenSiblings.add(sibling);
         }
+        bringToFront();
     }
 
     /**
@@ -447,6 +489,10 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
         updateRomajiLabel();
 
         scrollView.scrollTo(0, 0);
+        scrollView.post(() -> {
+            scrollView.scrollTo(0, 0);
+            scrollView.pageScroll(View.FOCUS_UP);
+        });
     }
 
     /**

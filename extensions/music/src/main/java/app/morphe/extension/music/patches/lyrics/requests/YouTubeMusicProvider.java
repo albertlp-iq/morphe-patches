@@ -122,17 +122,31 @@ public final class YouTubeMusicProvider implements LyricsProvider {
                         continue;
                     }
                     JSONObject cueRange = item.optJSONObject("cueRange");
-                    long startMs = 0;
+                    long startMs = -1;
                     if (cueRange != null) {
-                        try {
-                            startMs = Long.parseLong(cueRange.optString("startTimeMilliseconds", "0"));
-                        } catch (NumberFormatException ignored) {
+                        startMs = cueRange.optLong("startTimeMilliseconds", -1);
+                        if (startMs < 0) {
+                            try {
+                                startMs = Long.parseLong(cueRange.optString("startTimeMilliseconds", "-1"));
+                            } catch (NumberFormatException ignored) {
+                            }
                         }
                     }
                     lines.add(new LyricsLine(startMs, text));
                 }
                 if (!lines.isEmpty()) {
-                    return new Lyrics(lines, "YouTube Music", true);
+                    String sourceName = "YouTube Music";
+                    JSONObject footer = findObject(browseResponse, "footer");
+                    if (footer != null) {
+                        JSONArray footerRuns = footer.optJSONArray("runs");
+                        if (footerRuns != null && footerRuns.length() > 0) {
+                            String footerText = footerRuns.optJSONObject(0).optString("text", "");
+                            if (!footerText.isEmpty()) {
+                                sourceName = footerText;
+                            }
+                        }
+                    }
+                    return new Lyrics(lines, sourceName, true);
                 }
             }
 

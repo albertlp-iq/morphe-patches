@@ -23,6 +23,18 @@ public record Lyrics(List<LyricsLine> lines, String providerName, boolean synced
     public static final Lyrics NOT_FOUND = new Lyrics(Collections.emptyList(), "", false);
 
     public Lyrics {
+        if (synced) {
+            int timedCount = 0;
+            for (LyricsLine l : lines) {
+                if (l.startTimeMs() > 0) {
+                    timedCount++;
+                }
+            }
+            // If fewer than 2 lines have real timestamps, it cannot be reliably synced.
+            if (timedCount < 2) {
+                synced = false;
+            }
+        }
         lines = Collections.unmodifiableList(lines);
     }
 
@@ -49,7 +61,8 @@ public record Lyrics(List<LyricsLine> lines, String providerName, boolean synced
 
         // Fast path: still inside the hinted line, or moved into the next one.
         if (hintIndex >= 0 && hintIndex < size) {
-            if (positionMs >= lines.get(hintIndex).startTimeMs()) {
+            long hintedTime = lines.get(hintIndex).startTimeMs();
+            if (hintedTime >= 0 && positionMs >= hintedTime) {
                 final int next = hintIndex + 1;
                 if (next >= size || positionMs < lines.get(next).startTimeMs()) {
                     return hintIndex;
@@ -62,7 +75,11 @@ public record Lyrics(List<LyricsLine> lines, String providerName, boolean synced
 
         int result = -1;
         for (int i = 0; i < size; i++) {
-            if (lines.get(i).startTimeMs() > positionMs) {
+            long lineTime = lines.get(i).startTimeMs();
+            if (lineTime < 0) {
+                continue;
+            }
+            if (lineTime > positionMs) {
                 break;
             }
             result = i;

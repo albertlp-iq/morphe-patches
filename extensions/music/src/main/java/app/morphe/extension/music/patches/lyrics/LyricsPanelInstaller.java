@@ -114,6 +114,7 @@ public final class LyricsPanelInstaller {
             // Reopening the panel makes the app restore its own content, so the
             // overlay state has to be reapplied rather than assumed still correct.
             existing.syncOverlay();
+            existing.bringToFront();
             return;
         }
 
@@ -148,9 +149,15 @@ public final class LyricsPanelInstaller {
         if (title == null) {
             return false;
         }
+        String actual = String.valueOf(title.getText()).trim();
         String expectedTitle = lyricsTitle();
-        return expectedTitle != null
-                && expectedTitle.equalsIgnoreCase(String.valueOf(title.getText()));
+        if (expectedTitle != null && expectedTitle.equalsIgnoreCase(actual)) {
+            return true;
+        }
+        String lower = actual.toLowerCase(java.util.Locale.ROOT);
+        return lower.contains("lyric") || lower.contains("歌詞") || lower.contains("letra")
+                || lower.contains("parole") || lower.contains("текст") || lower.contains("lirik")
+                || lower.contains("songtext") || lower.contains("testi");
     }
 
     /**
