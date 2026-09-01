@@ -358,6 +358,13 @@ To ensure scrobbling is synced during background playback, ensure that YouTube M
     <string name="morphe_music_lyrics_translate_hide">Show original</string>
     <string name="morphe_music_lyrics_translating">Translating…</string>
     <string name="morphe_music_lyrics_translate_failed">Could not translate the lyrics</string>
+    <string name="morphe_music_lyrics_romaji_show">Romaji</string>
+    <string name="morphe_music_lyrics_romaji_hide">Original</string>
+    <string name="morphe_music_lyrics_romanize_title">Romanize Japanese lyrics</string>
+    <string name="morphe_music_lyrics_romanize_summary">Translates Kanji, Hiragana, and Katakana characters to Romaji</string>
+    <string name="morphe_music_lyrics_auto_romanize_title">Auto-romanize Japanese lyrics</string>
+    <string name="morphe_music_lyrics_auto_romanize_summary">Automatically displays Romaji when a song contains Japanese lyrics</string>
+    <string name="morphe_music_lyrics_show_romaji_button_title">Show Romaji button</string>
     <string name="morphe_music_lyrics_copy">Copy</string>
     <string name="morphe_music_lyrics_copied">Copied to clipboard</string>
     <string name="morphe_music_lyrics_about_title">About third-party lyrics</string>

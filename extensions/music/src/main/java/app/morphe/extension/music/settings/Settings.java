@@ -173,6 +173,9 @@ public class Settings extends SharedYouTubeSettings {
     public static final BooleanSetting LYRICS_ENABLED = new BooleanSetting("morphe_music_lyrics_enabled", FALSE, true);
     public static final EnumSetting<LyricsSource> LYRICS_SOURCE = new EnumSetting<>("morphe_music_lyrics_source", LyricsSource.LRCLIB_THEN_KUGOU, true, parent(LYRICS_ENABLED));
     public static final BooleanSetting LYRICS_TRANSLATE = new BooleanSetting("morphe_music_lyrics_translate", FALSE, true, parent(LYRICS_ENABLED));
+    public static final BooleanSetting LYRICS_ROMANIZE = new BooleanSetting("morphe_music_lyrics_romanize", FALSE, true, parent(LYRICS_ENABLED));
+    public static final BooleanSetting LYRICS_AUTO_ROMANIZE = new BooleanSetting("morphe_music_lyrics_auto_romanize", TRUE, true, parent(LYRICS_ENABLED));
+    public static final BooleanSetting LYRICS_SHOW_ROMAJI_BUTTON = new BooleanSetting("morphe_music_lyrics_show_romaji_button", TRUE, true, parent(LYRICS_ENABLED));
     public static final BooleanSetting LYRICS_TAP_TO_SEEK = new BooleanSetting("morphe_music_lyrics_tap_to_seek", TRUE, true, parent(LYRICS_ENABLED));
     public static final BooleanSetting LYRICS_SHOW_COPY_BUTTON = new BooleanSetting("morphe_music_lyrics_show_copy_button", TRUE, true, parent(LYRICS_ENABLED));
     public static final BooleanSetting LYRICS_SHOW_TRANSLATE_BUTTON = new BooleanSetting("morphe_music_lyrics_show_translate_button", TRUE, true, parent(LYRICS_ENABLED));

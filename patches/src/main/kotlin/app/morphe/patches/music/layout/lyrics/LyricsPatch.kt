@@ -61,6 +61,8 @@ val lyricsPatch = bytecodePatch(
             SwitchPreference("morphe_music_lyrics_enabled", summary = true),
             ListPreference("morphe_music_lyrics_source"),
             SwitchPreference("morphe_music_lyrics_tap_to_seek", summary = true),
+            SwitchPreference("morphe_music_lyrics_auto_romanize", summary = true),
+            SwitchPreference("morphe_music_lyrics_show_romaji_button"),
             SwitchPreference("morphe_music_lyrics_show_copy_button"),
             SwitchPreference("morphe_music_lyrics_show_translate_button"),
             NonInteractivePreference(

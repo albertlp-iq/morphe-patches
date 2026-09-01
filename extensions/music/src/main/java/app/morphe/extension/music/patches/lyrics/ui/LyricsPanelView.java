@@ -47,6 +47,7 @@ import app.morphe.extension.music.patches.lyrics.TrackInfo;
 import app.morphe.extension.music.settings.Settings;
 import app.morphe.extension.music.shared.VideoInformation;
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.shared.translation.RomajiTransliterator;
 import app.morphe.extension.shared.ResourceType;
 import app.morphe.extension.shared.ResourceUtils;
 import app.morphe.extension.shared.Utils;
@@ -112,6 +113,8 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
     private final TextView footerView;
     @Nullable
     private final TextView translateView;
+    @Nullable
+    private final TextView romajiView;
     private final LinearLayout footerContainer;
     private final LinearLayout buttonRow;
     private final ProgressBar progressBar;
@@ -119,6 +122,10 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
     /** One translated line per lyrics line, or {@code null} when showing the original only. */
     @Nullable
     private List<String> translatedLines;
+
+    /** One romaji line per lyrics line, or {@code null} when showing the original only. */
+    @Nullable
+    private List<String> romajiLines;
 
     private final List<TextView> lineViews = new ArrayList<>();
 
@@ -196,6 +203,19 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
             translateView = null;
         }
 
+        if (Settings.LYRICS_SHOW_ROMAJI_BUTTON.get()) {
+            romajiView = new TextView(context);
+            applyButtonStyle(romajiView, null);
+            romajiView.setOnClickListener(view -> onRomajiClicked());
+            LinearLayout.LayoutParams romajiParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            romajiParams.setMarginStart(Dim.dp12);
+            buttonRow.addView(romajiView, romajiParams);
+        } else {
+            romajiView = null;
+        }
+
         // The source line lives in a container of its own, so that lyrics lines can be
         // inserted before it without depending on how many views it holds.
         footerContainer = new LinearLayout(context);
@@ -268,6 +288,7 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
             userScrollUntilUptimeMs = 0;
             // The previous translation belongs to the previous track.
             translatedLines = null;
+            romajiLines = null;
 
             switch (state) {
                 case LOADING:
@@ -278,6 +299,12 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
                     if (newLyrics == null || newLyrics.isEmpty()) {
                         setOverlayVisible(false);
                     } else {
+                        if (Settings.LYRICS_AUTO_ROMANIZE.get() || Settings.LYRICS_ROMANIZE.get()) {
+                            List<String> raw = extractLines(newLyrics);
+                            if (RomajiTransliterator.hasJapaneseLines(raw)) {
+                                romajiLines = RomajiTransliterator.transliterateLines(raw);
+                            }
+                        }
                         showLyrics(newLyrics);
                         setOverlayVisible(true);
                         if (Settings.LYRICS_TRANSLATE.get()) {
@@ -417,32 +444,57 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
         footerView.setVisibility(VISIBLE);
         buttonRow.setVisibility(VISIBLE);
         updateTranslateLabel();
+        updateRomajiLabel();
 
         scrollView.scrollTo(0, 0);
     }
 
     /**
-     * Line text, with the translation appended below the original in a smaller,
+     * Line text, with romaji and translation appended below the original in a smaller,
      * dimmer style. Both live in one view so that highlighting, fading and auto
      * scrolling keep working on whole lines.
      */
     private CharSequence lineText(String original, int index) {
-        List<String> translated = translatedLines;
-        if (translated == null || index >= translated.size()) {
+        String romaji = (romajiLines != null && index < romajiLines.size())
+                ? romajiLines.get(index).trim() : null;
+        String translation = (translatedLines != null && index < translatedLines.size())
+                ? translatedLines.get(index).trim() : null;
+
+        StringBuilder sb = new StringBuilder(original);
+        int romajiStart = -1;
+        int romajiEnd = -1;
+        int translationStart = -1;
+        int translationEnd = -1;
+
+        if (romaji != null && !romaji.isEmpty() && !romaji.equalsIgnoreCase(original)) {
+            romajiStart = sb.length() + 1;
+            sb.append('\n').append(romaji);
+            romajiEnd = sb.length();
+        }
+
+        if (translation != null && !translation.isEmpty() && !translation.equals(original) && !translation.equalsIgnoreCase(romaji)) {
+            translationStart = sb.length() + 1;
+            sb.append('\n').append(translation);
+            translationEnd = sb.length();
+        }
+
+        if (romajiStart == -1 && translationStart == -1) {
             return original;
         }
 
-        String translation = translated.get(index).trim();
-        if (translation.isEmpty() || translation.equals(original)) {
-            return original;
+        SpannableString text = new SpannableString(sb.toString());
+        if (romajiStart != -1) {
+            text.setSpan(new RelativeSizeSpan(TRANSLATION_RELATIVE_SIZE), romajiStart, romajiEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setSpan(new ForegroundColorSpan(secondaryTextColor()), romajiStart, romajiEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-
-        SpannableString text = new SpannableString(original + "\n" + translation);
-        final int start = original.length() + 1;
-        text.setSpan(new RelativeSizeSpan(TRANSLATION_RELATIVE_SIZE), start, text.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        text.setSpan(new ForegroundColorSpan(secondaryTextColor()), start, text.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (translationStart != -1) {
+            text.setSpan(new RelativeSizeSpan(TRANSLATION_RELATIVE_SIZE), translationStart, translationEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setSpan(new ForegroundColorSpan(secondaryTextColor()), translationStart, translationEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
         return text;
     }
 
@@ -491,8 +543,8 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
     }
 
     /**
-     * Copies the lyrics to the clipboard, with the translation under each line when
-     * it is shown, so what is copied matches what is on screen.
+     * Copies the lyrics to the clipboard, with the romaji and translation under each line when
+     * they are shown, so what is copied matches what is on screen.
      */
     private void onCopyClicked() {
         try {
@@ -511,6 +563,10 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
                 }
                 text.append(lines.get(i).text());
 
+                if (romajiLines != null && i < romajiLines.size() && !romajiLines.get(i).isEmpty()) {
+                    text.append('\n').append(romajiLines.get(i));
+                }
+
                 if (translated != null && i < translated.size() && !translated.get(i).isEmpty()) {
                     text.append('\n').append(translated.get(i));
                 }
@@ -528,12 +584,57 @@ public final class LyricsPanelView extends FrameLayout implements LyricsManager.
         }
     }
 
+    private void onRomajiClicked() {
+        try {
+            if (romajiView == null) {
+                return;
+            }
+
+            Lyrics current = lyrics;
+            if (current == null) {
+                return;
+            }
+
+            if (romajiLines != null) {
+                Settings.LYRICS_ROMANIZE.save(false);
+                romajiLines = null;
+                updateRomajiLabel();
+                showLyrics(current);
+                return;
+            }
+
+            Settings.LYRICS_ROMANIZE.save(true);
+            List<String> raw = extractLines(current);
+            romajiLines = RomajiTransliterator.transliterateLines(raw);
+            updateRomajiLabel();
+            showLyrics(current);
+        } catch (Exception ex) {
+            Logger.printException(() -> "onRomajiClicked failure", ex);
+        }
+    }
+
     private void updateTranslateLabel() {
         if (translateView != null) {
             translateView.setText(str(translatedLines == null
                     ? "morphe_music_lyrics_translate_show"
                     : "morphe_music_lyrics_translate_hide"));
         }
+    }
+
+    private void updateRomajiLabel() {
+        if (romajiView != null) {
+            romajiView.setText(str(romajiLines == null
+                    ? "morphe_music_lyrics_romaji_show"
+                    : "morphe_music_lyrics_romaji_hide"));
+        }
+    }
+
+    private static List<String> extractLines(Lyrics lyrics) {
+        List<String> lines = new ArrayList<>(lyrics.lines().size());
+        for (LyricsLine line : lyrics.lines()) {
+            lines.add(line.text());
+        }
+        return lines;
     }
 
     private void clearLines() {
