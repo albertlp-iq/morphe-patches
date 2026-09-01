@@ -35,7 +35,7 @@ All modifications made by Morphe, along with their dates, can be found in the Gi
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v1.40.0](https://github.com/MorpheApp/morphe-patches/releases/tag/v1.40.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;136 patches total
+> **[v1.0.0](https://github.com/albertlp-iq/morphe-patches/releases/tag/v1.0.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;137 patches total
 <details>
 <summary>📦 YouTube&nbsp;&nbsp;•&nbsp;&nbsp;75 patches</summary>
 <br>
@@ -126,7 +126,7 @@ All modifications made by Morphe, along with their dates, can be found in the Gi
 </details>
 
 <details>
-<summary>📦 YouTube Music&nbsp;&nbsp;•&nbsp;&nbsp;39 patches</summary>
+<summary>📦 YouTube Music&nbsp;&nbsp;•&nbsp;&nbsp;40 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -159,6 +159,7 @@ All modifications made by Morphe, along with their dates, can be found in the Gi
 | [Hide flyout menu components](#hide-flyout-menu-components) | Adds options to hide individual items from the player and queue flyout menus. |  |
 | [Hide layout components](#hide-layout-components) | Adds options to hide general layout components. |  |
 | [Hide music action buttons](#hide-music-action-buttons) | Adds options to hide action buttons under the player. |  |
+| [Japanese lyrics romanization](#japanese-lyrics-romanization) | Translates Japanese Kanji, Hiragana, and Katakana characters in lyrics to Romaji for singing along. |  |
 | [Miniplayer previous and next buttons](#miniplayer-previous-and-next-buttons) | Adds options to show previous and next track buttons in the miniplayer. |  |
 | [Navigation bar](#navigation-bar) | Adds options to hide navigation bar, labels and buttons. |  |
 | [Network proxy](#network-proxy) | Adds settings to route supported network requests through an HTTP or HTTPS proxy. |  |
