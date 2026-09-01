@@ -10,6 +10,7 @@ package app.morphe.extension.music.patches.lyrics;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -98,9 +99,18 @@ public final class LyricsTranslator {
                 // A mismatched count cannot be mapped back safely, and showing lines
                 // under the wrong lyrics is worse than showing no translation at all.
                 if (translatedBatch.size() != batch.size()) {
-                    Logger.printDebug(() -> "Discarding translation: expected " + batch.size()
-                            + " lines but got " + translatedBatch.size());
-                    return null;
+                    Logger.printDebug(() -> "Batch line count mismatched (expected " + batch.size()
+                            + " but got " + translatedBatch.size() + "), falling back to line-by-line translation");
+                    translatedBatch = new ArrayList<>(batch.size());
+                    for (String singleLine : batch) {
+                        try {
+                            List<String> singleRes = TextTranslator.translate(
+                                    Collections.singletonList(singleLine), language);
+                            translatedBatch.add(singleRes.isEmpty() ? singleLine : singleRes.get(0));
+                        } catch (Exception ex) {
+                            translatedBatch.add(singleLine);
+                        }
+                    }
                 }
                 translated.addAll(translatedBatch);
             }

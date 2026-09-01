@@ -312,7 +312,7 @@ def test_song(artist, track, compounds, kanji_table):
     except Exception as ex:
         print(f"Could not fetch from LRCLIB: {ex}")
 
-def test_youtube(video_id_or_url, compounds, kanji_table):
+def test_youtube(video_id_or_url, compounds, kanji_table, translate_lang=None):
     import re
     import json
     m = re.search(r'([a-zA-Z0-9_-]{11})', video_id_or_url)
@@ -382,13 +382,45 @@ def test_youtube(video_id_or_url, compounds, kanji_table):
             print("No lyrics lines found in response.")
             return
 
-        for line in lines[:15]:
+        translate_lines = None
+        if translate_lang:
+            translate_lines = test_online_translation(lines[:15], translate_lang)
+
+        for i, line in enumerate(lines[:15]):
             rom = transliterate_to_romaji(line, compounds, kanji_table)
             print(f"  {line}")
-            print(f"  -> {rom}\n")
+            print(f"  -> Romaji: {rom}")
+            if translate_lines and i < len(translate_lines):
+                print(f"  -> Trans:  {translate_lines[i]}")
+            print()
 
     except Exception as ex:
         print(f"Could not fetch from YouTube Music: {ex}")
+
+def test_online_translation(lines, target_lang="en"):
+    import urllib.parse
+    endpoints = [
+        f"https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl={target_lang}",
+        f"https://clients5.google.com/translate_a/t?client=at&sl=auto&tl={target_lang}"
+    ]
+    joined = "\n".join(lines)
+    data = urllib.parse.urlencode({"q": joined}).encode("utf-8")
+    headers = {"Content-Type": "application/x-www-form-urlencoded", "User-Agent": "Mozilla/5.0"}
+    for ep in endpoints:
+        try:
+            req = urllib.request.Request(ep, data=data, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                raw = resp.read().decode("utf-8")
+                j = json.loads(raw)
+                if isinstance(j, list) and len(j) > 0:
+                    first = j[0]
+                    trans_text = first[0] if isinstance(first, list) else first
+                    split_res = trans_text.split("\n")
+                    if len(split_res) == len(lines):
+                        return split_res
+        except Exception as e:
+            pass
+    return None
 
 def test_interactive(compounds, kanji_table):
     print("\n" + "=" * 60)
@@ -416,6 +448,7 @@ def main():
     parser.add_argument("-i", "--interactive", action="store_true", help="Start interactive REPL")
     parser.add_argument("--song", nargs=2, metavar=("ARTIST", "TITLE"), help="Fetch and test song from LRCLIB")
     parser.add_argument("--yt", metavar="VIDEO_ID_OR_URL", help="Fetch and test lyrics directly from YouTube Music / LyricFind")
+    parser.add_argument("--translate", nargs="?", const="en", metavar="LANG", help="Also translate lines (e.g. en, id)")
 
     args = parser.parse_args()
 
@@ -424,7 +457,7 @@ def main():
     print(f" done! ({len(compounds)} compounds, {len(kanji_table)} kanji loaded)\n")
 
     if args.yt:
-        test_youtube(args.yt, compounds, kanji_table)
+        test_youtube(args.yt, compounds, kanji_table, translate_lang=args.translate)
     elif args.song:
         test_song(args.song[0], args.song[1], compounds, kanji_table)
     elif args.interactive:
@@ -432,6 +465,10 @@ def main():
     elif args.text:
         print(f"Original: {args.text}")
         print(f"Romaji:   {transliterate_to_romaji(args.text, compounds, kanji_table)}")
+        if args.translate:
+            trans = test_online_translation([args.text], args.translate)
+            if trans:
+                print(f"Trans:    {trans[0]}")
     else:
         test_default(compounds, kanji_table)
 
