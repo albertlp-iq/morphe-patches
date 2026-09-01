@@ -1,3 +1,9 @@
+## [1.42.1](https://github.com/albertlp-iq/morphe-patches/compare/v1.42.0...v1.42.1) (2026-09-01)
+
+### 🐛 Bug Fixes
+
+* **music:** fix native lyrics overlap, prevent scroll to bottom, and improve LyricFind timing ([4299303](https://github.com/albertlp-iq/morphe-patches/commit/4299303c2cb6726304e49b8a9c9e9353033c8c0b))
+
 ## [1.42.0](https://github.com/albertlp-iq/morphe-patches/compare/v1.41.0...v1.42.0) (2026-09-01)
 
 ### ✨ New Features
