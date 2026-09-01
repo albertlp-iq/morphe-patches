@@ -428,10 +428,10 @@ public final class RomajiTransliterator {
         KANA_SINGLE.put('、', ", ");
         KANA_SINGLE.put('。', ". ");
         KANA_SINGLE.put('・', " ");
-        KANA_SINGLE.put('「', """);
-        KANA_SINGLE.put('」', """);
-        KANA_SINGLE.put('『', """);
-        KANA_SINGLE.put('』', """);
+        KANA_SINGLE.put('「', "\"");
+        KANA_SINGLE.put('」', "\"");
+        KANA_SINGLE.put('『', "\"");
+        KANA_SINGLE.put('』', "\"");
         KANA_SINGLE.put('〜', "~");
         KANA_SINGLE.put('～', "~");
         KANA_SINGLE.put('　', " ");
