@@ -1,3 +1,10 @@
+## [1.42.2](https://github.com/albertlp-iq/morphe-patches/compare/v1.42.1...v1.42.2) (2026-09-01)
+
+### 🐛 Bug Fixes
+
+* **music:** make lambda variables final in LyricsTranslator ([63915aa](https://github.com/albertlp-iq/morphe-patches/commit/63915aa4ee9d465669dd3fb12a362a5de39848a6))
+* **translation:** use unblocked clients5 Google Translate endpoint with multi-endpoint fallback ([30fdc24](https://github.com/albertlp-iq/morphe-patches/commit/30fdc24e0d3852a7ab823bb000dd9b5b2e7b0bf3))
+
 ## [1.42.1](https://github.com/albertlp-iq/morphe-patches/compare/v1.42.0...v1.42.1) (2026-09-01)
 
 ### 🐛 Bug Fixes
