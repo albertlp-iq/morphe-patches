@@ -1,3 +1,15 @@
+## [1.41.0](https://github.com/albertlp-iq/morphe-patches/compare/v1.40.0...v1.41.0) (2026-09-01)
+
+### 🐛 Bug Fixes
+
+* **build:** escape quote literals in RomajiTransliterator and fix imports in JapaneseLyricsPatch ([1ac31df](https://github.com/albertlp-iq/morphe-patches/commit/1ac31dfc14f18f152c732a2ca7bfc1e4b400d345))
+* **release:** fix E2BIG by shortening release commit message in .releaserc ([a15434c](https://github.com/albertlp-iq/morphe-patches/commit/a15434cf1fac3823f6904d28f11de3c09572474e))
+
+### ✨ New Features
+
+* **music:** add Japanese lyrics romanization patch ([a0cb6bc](https://github.com/albertlp-iq/morphe-patches/commit/a0cb6bc2ba2b9c11e9225ea3d6082b9419a1c5b8))
+* **music:** add test_romaji.py and refine okurigana/single-kanji transliteration ([0886d2d](https://github.com/albertlp-iq/morphe-patches/commit/0886d2db03bb1251b57b362b7ac627f4f855e67f))
+
 ## 1.0.0 (2026-09-01)
 
 ### 🐛 Bug Fixes
