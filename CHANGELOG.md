@@ -1,3 +1,9 @@
+## [1.42.0](https://github.com/albertlp-iq/morphe-patches/compare/v1.41.0...v1.42.0) (2026-09-01)
+
+### ✨ New Features
+
+* **music:** add YouTubeMusicProvider to support LyricFind and embedded video lyrics with free translation and romaji ([174620a](https://github.com/albertlp-iq/morphe-patches/commit/174620a354a5694eb917878dd44e09f735ca9c1b))
+
 ## [1.41.0](https://github.com/albertlp-iq/morphe-patches/compare/v1.40.0...v1.41.0) (2026-09-01)
 
 ### 🐛 Bug Fixes

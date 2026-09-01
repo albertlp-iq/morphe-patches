@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-01T07:23:24",
-  "description": "## [1.41.0](https://github.com/albertlp-iq/morphe-patches/compare/v1.40.0...v1.41.0) (2026-09-01)\n\n### 🐛 Bug Fixes\n\n* **build:** escape quote literals in RomajiTransliterator and fix imports in JapaneseLyricsPatch ([1ac31df](https://github.com/albertlp-iq/morphe-patches/commit/1ac31dfc14f18f152c732a2ca7bfc1e4b400d345))\n* **release:** fix E2BIG by shortening release commit message in .releaserc ([a15434c](https://github.com/albertlp-iq/morphe-patches/commit/a15434cf1fac3823f6904d28f11de3c09572474e))\n\n### ✨ New Features\n\n* **music:** add Japanese lyrics romanization patch ([a0cb6bc](https://github.com/albertlp-iq/morphe-patches/commit/a0cb6bc2ba2b9c11e9225ea3d6082b9419a1c5b8))\n* **music:** add test_romaji.py and refine okurigana/single-kanji transliteration ([0886d2d](https://github.com/albertlp-iq/morphe-patches/commit/0886d2db03bb1251b57b362b7ac627f4f855e67f))",
-  "download_url": "https://github.com/albertlp-iq/morphe-patches/releases/download/v1.41.0/patches-1.41.0.mpp",
+  "created_at": "2026-09-01T08:01:05",
+  "description": "## [1.42.0](https://github.com/albertlp-iq/morphe-patches/compare/v1.41.0...v1.42.0) (2026-09-01)\n\n### ✨ New Features\n\n* **music:** add YouTubeMusicProvider to support LyricFind and embedded video lyrics with free translation and romaji ([174620a](https://github.com/albertlp-iq/morphe-patches/commit/174620a354a5694eb917878dd44e09f735ca9c1b))",
+  "download_url": "https://github.com/albertlp-iq/morphe-patches/releases/download/v1.42.0/patches-1.42.0.mpp",
   "signature_download_url": "",
-  "version": "1.41.0"
+  "version": "1.42.0"
 }
